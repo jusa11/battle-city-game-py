@@ -1,5 +1,5 @@
 import pygame
-from config import SCREEN_WIDTH, SCREEN_HEIGHT, BACKGROUND_FILL, ENEMY_TANK_COUNT
+from config import SCREEN_WIDTH, SCREEN_HEIGHT, BACKGROUND_FILL
 from MainTank import MainTankSet
 from EnemyTank import EnemyTankSet
 
@@ -14,56 +14,69 @@ class GameSet:
         self.game_over_rectangle = self.game_over_text.get_rect()
         self.main_tank = MainTankSet(SCREEN_WIDTH, SCREEN_HEIGHT)
         self.enemy_tanks = pygame.sprite.Group()
-        self.all_sprites = pygame.sprite.Group(self.main_tank)
-        self.all_rockets = self.main_tank.rockets
-        self.tanks_collision = False
+        self.destroy_tank_sound = pygame.mixer.Sound(
+            file='./sounds/explosion-tank.mp3')
 
-    def init(self):
-        pygame.display.set_caption("Battle city")
+    def init_game(self):
         self.screen.fill(BACKGROUND_FILL)
-
         game_score_text = self.game_font.render(
             f"Score: {self.game_score}", True, 'white')
         self.screen.blit(game_score_text, (20, 20))
 
     def run(self):
+        # Движение игрока
+        self.main_tank.control_moving(self)
+        self.main_tank.move(self.enemy_tanks)
+        self.draw_sprite(self.main_tank)
 
-        self.main_tank.control_moving()
-        self.main_tank.move()
+        # Проверка столкновений
+        collided_enemies = pygame.sprite.spritecollide(
+            self.main_tank,
+            self.enemy_tanks,
+            False,
+            pygame.sprite.collide_mask
+        )
 
-        main_tank_move = pygame.transform.rotate(
-            self.main_tank.img, self.main_tank.angle)
-        self.screen.blit(main_tank_move, (self.main_tank.x, self.main_tank.y))
+        # Респаун врагов
+        while len(self.enemy_tanks) < 1:
+            self.spawn_enemy_tanks()
 
-        tanks_collision = pygame.sprite.groupcollide(
-            self.all_sprites, self.enemy_tanks, False, False)
-
-        if tanks_collision:
-            self.tanks_collision = True
-
-        if len(self.enemy_tanks) < 4:
-            while len(self.enemy_tanks) < 4:
-                new_enemy_tank = EnemyTankSet()
-                self.enemy_tanks.add(new_enemy_tank)
-
+        # Движение врагов
         for enemy_tank in self.enemy_tanks:
-            self.screen.blit(enemy_tank.img, (enemy_tank.x, enemy_tank.y))
-            enemy_tank.move(self.screen, tanks_collision)
+            collided = enemy_tank in collided_enemies
+            enemy_tank.move(collided)
+            self.draw_sprite(enemy_tank)
 
-        for rocket in self.all_rockets:
+        # Движение ракеты
+        for rocket in self.main_tank.rockets:
             self.screen.blit(rocket.img, (rocket.x, rocket.y))
-            rocket.shot(self.screen)
+            rocket.shot()
+            rocket.update()
+            self.draw_sprite(rocket)
 
-
-
-
-
+        # Попадание ракеты
         hits = pygame.sprite.groupcollide(
             self.main_tank.rockets, self.enemy_tanks, True, True)
-
-        if hits:
+        for rocket, enemies in hits.items():
             rocket.shell_explosion(self.screen)
-            
+            self.game_score += 150
+            self.destroy_tank_sound.play()
+
+    def draw_sprite(self, sprite):
+        """Поворачивает танк"""
+        rotated = pygame.transform.rotate(sprite.img, sprite.angle)
+        # Правильное позиционирование центра
+        rotated_rect = rotated.get_rect(center=sprite.rect.center)
+        # Обновляем маску под новый поворот
+        sprite.mask = pygame.mask.from_surface(rotated)
+        # Рисуем
+        self.screen.blit(rotated, rotated_rect)
+
+
+    def spawn_enemy_tanks(self):
+        new_enemy_tank = EnemyTankSet()
+        self.enemy_tanks.add(new_enemy_tank)
+
 
     def over(self):
         game_over_text = self.game_font.render('Game over', True, 'white')
