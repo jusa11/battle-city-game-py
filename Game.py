@@ -29,22 +29,13 @@ class GameSet:
         self.main_tank.move(self.enemy_tanks)
         self.draw_sprite(self.main_tank)
 
-        # Проверка столкновений главного с врагом
-        collided_enemies = pygame.sprite.spritecollide(
-            self.main_tank,
-            self.enemy_tanks,
-            False,
-            pygame.sprite.collide_mask
-        )
-
         # Респаун врагов
-        while len(self.enemy_tanks) < 16:
+        while len(self.enemy_tanks) < 10:
             self.spawn_enemy_tanks()
 
         # Движение врагов
         for enemy_tank in self.enemy_tanks:
-            collided = enemy_tank in collided_enemies
-            enemy_tank.move(collided)
+            enemy_tank.move(self.main_tank, self.enemy_tanks)
             self.draw_sprite(enemy_tank)
 
         # Движение ракеты

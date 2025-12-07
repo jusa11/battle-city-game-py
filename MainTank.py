@@ -76,9 +76,7 @@ class MainTankSet(pygame.sprite.Sprite):
 
         # проверка столкновений с врагами
         for enemy in enemy_tanks:
-            print(self.rect.colliderect(enemy.rect))
             if self.rect.colliderect(enemy.rect):
-                print(self.rect.colliderect(enemy.rect))
                 # откат при столкновении
                 self.rect = old_rect
                 self.x, self.y = old_rect.topleft

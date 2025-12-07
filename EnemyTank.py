@@ -16,8 +16,9 @@ class EnemyTankSet(pygame.sprite.Sprite):
         self.tanks_collisions = False
 
 
-    def move(self, tanks_collisions):
-        self.tanks_collisions = tanks_collisions
+    def move(self, main_tank, enemy_tanks):
+
+        old_pos = self.rect.topleft
 
         # Движение
         if self.angle == 180:
@@ -31,18 +32,29 @@ class EnemyTankSet(pygame.sprite.Sprite):
 
         # Если упёрся в край — меняем направление
         if (
-                self.rect.x < 0 or
-                self.rect.x > SCREEN_WIDTH - self.width or
-                self.rect.y < 0 or
-                self.rect.y > SCREEN_HEIGHT - self.height
+            self.rect.x < 0 or
+            self.rect.x > SCREEN_WIDTH - self.width or
+            self.rect.y < 0 or
+            self.rect.y > SCREEN_HEIGHT - self.height
         ):
-            self.tanks_collisions = True
+            self.rect.topleft = old_pos
+            self.change_direction()
 
-        if self.tanks_collisions:
-            print('Is collision')
-            self.backstep()
+
+        # Проверка столкновения врага с главным танком
+        if pygame.sprite.collide_mask(self, main_tank):
+            self.rect.topleft = old_pos
             self.change_direction()
             return
+
+
+        for enemy_tank in enemy_tanks:
+            if enemy_tank is not self:
+                if pygame.sprite.collide_mask(self, enemy_tank):
+                    self.rect.topleft = old_pos
+                    self.change_direction()
+                    return
+
 
     def backstep(self):
         if self.angle == 180:
