@@ -29,7 +29,7 @@ class GameSet:
         self.main_tank.move(self.enemy_tanks)
         self.draw_sprite(self.main_tank)
 
-        # Проверка столкновений
+        # Проверка столкновений главного с врагом
         collided_enemies = pygame.sprite.spritecollide(
             self.main_tank,
             self.enemy_tanks,
@@ -38,7 +38,7 @@ class GameSet:
         )
 
         # Респаун врагов
-        while len(self.enemy_tanks) < 1:
+        while len(self.enemy_tanks) < 16:
             self.spawn_enemy_tanks()
 
         # Движение врагов
@@ -62,15 +62,12 @@ class GameSet:
             self.game_score += 150
             self.destroy_tank_sound.play()
 
+
     def draw_sprite(self, sprite):
-        """Поворачивает танк"""
         rotated = pygame.transform.rotate(sprite.img, sprite.angle)
-        # Правильное позиционирование центра
-        rotated_rect = rotated.get_rect(center=sprite.rect.center)
-        # Обновляем маску под новый поворот
+        sprite.rect = rotated.get_rect(center=sprite.rect.center)
         sprite.mask = pygame.mask.from_surface(rotated)
-        # Рисуем
-        self.screen.blit(rotated, rotated_rect)
+        self.screen.blit(rotated, sprite.rect)
 
 
     def spawn_enemy_tanks(self):

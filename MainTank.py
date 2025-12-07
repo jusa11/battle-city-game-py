@@ -51,73 +51,50 @@ class MainTankSet(pygame.sprite.Sprite):
                         self.moving_direction = None
 
     def move(self, enemy_tanks):
-        """Перемещение танка по игровому полю"""
         if not self.moving_direction:
             return
 
-        # Получаем dx / dy
-        _, _, (dx, dy) = next((v for k, v in self.key_to_direction.items()
-                               if v[0] == self.moving_direction),
-                              (None, None, (0, 0)))
+        # dx / dy
+        _, _, (dx, dy) = next(
+            (v for k, v in self.key_to_direction.items() if v[0] == self.moving_direction),
+            (None, None, (0, 0))
+        )
 
-        # Куда хотим поехать
-        next_rect = self.rect.move(dx * MAIN_TANK_STEP, dy * MAIN_TANK_STEP)
+        # сохраняем текущую позицию
+        old_rect = self.rect.copy()
 
-        # Флаги блокировки направления
-        block_x = False
-        block_y = False
+        # двигаем
+        self.rect.x += dx * MAIN_TANK_STEP
+        self.rect.y += dy * MAIN_TANK_STEP
+        self.x, self.y = self.rect.topleft
 
+        # не выходить за границы
+        if not (0 <= self.rect.x <= SCREEN_WIDTH - self.width):
+            self.rect.x = old_rect.x
+        if not (0 <= self.rect.y <= SCREEN_HEIGHT - self.height):
+            self.rect.y = old_rect.y
 
-        # Проверяем — будет ли столкновение
+        # проверка столкновений с врагами
         for enemy in enemy_tanks:
-            if next_rect.colliderect(enemy.rect):
-                print('main-left', self.rect.left)
-                print('enemy-right', enemy.rect.right)
-                print('main-right', self.rect.right)
-                print('enemy-left', enemy.rect.left)
-                # Проверка по X (перекрытие по горизонтали)
-                if (self.rect.left <= enemy.rect.right or
-                        self.rect.right >= enemy.rect.left):
-                    block_x = True
-                    print('Block_X is true')
-
-
-                # Проверка по Y (перекрытие по вертикали)
-                if (self.rect.bottom >= enemy.rect.top or
-                        self.rect.top <= enemy.rect.bottom):
-                    block_y = True
-                    print('Block_Y is true')
-                    print('main-bottom', self.rect.bottom)
-                    print('enemy-top', enemy.rect.top)
-                    print('main-top', self.rect.top)
-                    print('enemy-bottom', enemy.rect.bottom)
-
-
-
-        if not block_x:
-            new_x = self.x + dx * MAIN_TANK_STEP
-            if 0 <= new_x <= SCREEN_WIDTH - self.width:
-                self.x = new_x
-                self.rect.x = self.x
-
-        if not block_y:
-            new_y = self.y + dy * MAIN_TANK_STEP
-            if 0 <= new_y <= SCREEN_HEIGHT - self.height:
-                self.y = new_y
-                self.rect.y = self.y
-
+            print(self.rect.colliderect(enemy.rect))
+            if self.rect.colliderect(enemy.rect):
+                print(self.rect.colliderect(enemy.rect))
+                # откат при столкновении
+                self.rect = old_rect
+                self.x, self.y = old_rect.topleft
+                return
 
     def shot_gun(self, game):
-        if self.angle == 0:  # вверх
+        if self.angle == 0:
             rocket_x = self.x + self.width // 2 - 4
             rocket_y = self.y - 10
-        elif self.angle == 180:  # вниз
+        elif self.angle == 180:
             rocket_x = self.x + self.width // 2 - 4
             rocket_y = self.y + self.height
-        elif self.angle == 90:  # влево
+        elif self.angle == 90:
             rocket_x = self.x - 10
             rocket_y = self.y + self.height // 2 - 4
-        elif self.angle == -90:  # вправо
+        elif self.angle == -90:
             rocket_x = self.x + self.width
             rocket_y = self.y + self.height // 2 - 4
 
