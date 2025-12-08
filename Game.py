@@ -1,6 +1,6 @@
 import pygame
 from config import SCREEN_WIDTH, SCREEN_HEIGHT, BACKGROUND_FILL
-from MainTank import MainTankSet
+from MainTank import MainTank
 from EnemyTank import EnemyTankSet
 
 
@@ -12,7 +12,7 @@ class GameSet:
         self.is_running = True
         self.game_over_text = self.game_font.render('Game over', True, 'white')
         self.game_over_rectangle = self.game_over_text.get_rect()
-        self.main_tank = MainTankSet(SCREEN_WIDTH, SCREEN_HEIGHT)
+        self.main_tank = MainTank()
         self.enemy_tanks = pygame.sprite.Group()
         self.destroy_tank_sound = pygame.mixer.Sound(
             file='./sounds/explosion-tank.mp3')
@@ -25,7 +25,7 @@ class GameSet:
 
     def run(self):
         # Движение игрока
-        self.main_tank.control_moving(self)
+        self.main_tank.handle_user_input()
         self.main_tank.move(self.enemy_tanks)
         self.draw_sprite(self.main_tank)
 

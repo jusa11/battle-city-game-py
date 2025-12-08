@@ -1,0 +1,8 @@
+import pygame
+from  config import  SCREEN_WIDTH, SCREEN_HEIGHT
+
+MAIN_TANK_STEP = 6
+MAIN_TANK_IMAGE = pygame.image.load('./images/main-tank.png')
+MAIN_TANK_WIDTH, MAIN_TANK_HEIGHT = MAIN_TANK_IMAGE.get_size()
+MAIN_TANK_X = SCREEN_WIDTH / 2 - MAIN_TANK_WIDTH / 2
+MAIN_TANK_Y = SCREEN_HEIGHT - MAIN_TANK_HEIGHT
