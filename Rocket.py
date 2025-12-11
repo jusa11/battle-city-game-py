@@ -1,5 +1,5 @@
 import pygame
-from config import SCREEN_WIDTH, SCREEN_HEIGHT, ROCKET_SPEED
+from configs.config import SCREEN_WIDTH, SCREEN_HEIGHT, ROCKET_SPEED
 
 
 class RocketSet(pygame.sprite.Sprite):

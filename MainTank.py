@@ -1,7 +1,7 @@
 import sys
 import pygame
 from Tank import Tank
-from main_tank_config import MAIN_TANK_IMAGE, MAIN_TANK_X, MAIN_TANK_Y
+from configs.main_tank_config import MAIN_TANK_IMAGE, MAIN_TANK_X, MAIN_TANK_Y
 
 
 class MainTank(Tank):
@@ -9,7 +9,6 @@ class MainTank(Tank):
         super().__init__(MAIN_TANK_IMAGE, MAIN_TANK_X, MAIN_TANK_Y)
         self.driving_tank_sound = pygame.mixer.Sound(
             file='./sounds/ride-tank.mp3')
-        self.shot_sound = pygame.mixer.Sound(file='./sounds/shot-gun.mp3')
 
     def handle_user_input(self):
         """Обработка событий нажатия на клавиши"""
@@ -20,11 +19,9 @@ class MainTank(Tank):
 
                 if event.key == pygame.K_SPACE:
                     self.set_action('fire')
-                    self.shot_sound.play()
                 else:
                     self.set_action(event.key)
                     self.driving_tank_sound.play()
-                    print(dir(self))
 
             if event.type == pygame.KEYUP:
                 self.driving_tank_sound.stop()

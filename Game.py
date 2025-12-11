@@ -1,5 +1,5 @@
 import pygame
-from config import SCREEN_WIDTH, SCREEN_HEIGHT, BACKGROUND_FILL
+from configs.config import SCREEN_WIDTH, SCREEN_HEIGHT, BACKGROUND_FILL
 from MainTank import MainTank
 from EnemyTank import EnemyTankSet
 
@@ -26,15 +26,16 @@ class GameSet:
     def run(self):
         # Движение игрока
         self.main_tank.handle_user_input()
-        self.main_tank.move(self.enemy_tanks)
+        self.main_tank.move(self.main_tank, self.enemy_tanks)
         self.draw_sprite(self.main_tank)
 
         # Респаун врагов
-        while len(self.enemy_tanks) < 10:
+        while len(self.enemy_tanks) < 2:
             self.spawn_enemy_tanks()
 
         # Движение врагов
         for enemy_tank in self.enemy_tanks:
+            # enemy_tank.handle_user_input()
             enemy_tank.move(self.main_tank, self.enemy_tanks)
             self.draw_sprite(enemy_tank)
 
@@ -42,7 +43,7 @@ class GameSet:
         for rocket in self.main_tank.rockets:
             self.screen.blit(rocket.img, (rocket.x, rocket.y))
             rocket.shot()
-            rocket.update()
+            # rocket.update()
             self.draw_sprite(rocket)
 
         # Попадание ракеты

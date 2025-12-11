@@ -1,7 +1,8 @@
 import  pygame
 from Rocket import RocketSet
-from config import SCREEN_WIDTH, SCREEN_HEIGHT
-from main_tank_config import MAIN_TANK_STEP, MAIN_TANK_WIDTH, MAIN_TANK_HEIGHT
+from configs.config import SCREEN_WIDTH, SCREEN_HEIGHT
+from configs.main_tank_config import MAIN_TANK_STEP
+
 
 class Tank(pygame.sprite.Sprite):
     def __init__(self, tank_img, tank_x, tank_y, tank_angle=0):
@@ -15,6 +16,7 @@ class Tank(pygame.sprite.Sprite):
         self.angle = tank_angle
         self.direction = None
         self.rockets = pygame.sprite.Group()
+        self.shot_sound = pygame.mixer.Sound(file='./sounds/shot-gun.mp3')
         self.key_to_direction = {
             pygame.K_UP: ('up', 0, (0, -1)),
             pygame.K_DOWN: ('down', 180, (0, 1)),
@@ -35,8 +37,7 @@ class Tank(pygame.sprite.Sprite):
                 self.direction = None
 
 
-
-    def move(self, enemy_tanks):
+    def move(self, main_tank, enemy_tanks):
         if not self.direction:
             return
 
@@ -49,26 +50,30 @@ class Tank(pygame.sprite.Sprite):
         # сохраняем текущую позицию
         old_rect = self.rect.copy()
 
-
         # двигаем
         self.rect.x += dx * MAIN_TANK_STEP
         self.rect.y += dy * MAIN_TANK_STEP
         self.x, self.y = self.rect.topleft
 
-        print(bool(self.rect.colliderect))
         self.out_of_screen_restriction(old_rect)
-        self.check_collision(enemy_tanks, old_rect)
+        self.check_collision(main_tank, enemy_tanks, old_rect)
 
 
-    def check_collision(self, enemy_tanks, old_rect):
-        """Проверка столкновений с врагами"""
-        for enemy in enemy_tanks:
-            if self.rect.colliderect(enemy.rect):
-                # откат при столкновении
-                self.rect = old_rect
-                self.x, self.y = old_rect.topleft
-                return
+    def check_collision(self, main_tank, enemy_tanks, old_rect):
+        # Проверка столкновения врагов друг с другом
+        for enemy_tank in enemy_tanks:
+            if enemy_tank is not self:
+                if pygame.sprite.collide_mask(self, enemy_tank):
+                    self.rect.topleft = old_rect.topleft
+                    self.x, self.y = old_rect.topleft
+                    return
 
+        # Проверка столкновения с главным танком
+            if self is not main_tank:
+                if pygame.sprite.collide_mask(self, main_tank):
+                    self.rect.topleft = old_rect.topleft
+                    self.x, self.y = old_rect.topleft
+                    return
 
     def out_of_screen_restriction(self, old_rect):
         """Не выходить за границы"""
@@ -79,6 +84,8 @@ class Tank(pygame.sprite.Sprite):
 
 
     def shot_gun(self):
+        if len(self.rockets) > 0:
+            return
         """Выстрел пушки"""
         if self.angle == 0:
             rocket_x = self.x + self.width // 2 - 4
@@ -95,3 +102,5 @@ class Tank(pygame.sprite.Sprite):
 
         new_rocket = RocketSet(rocket_x, rocket_y, self.angle)
         self.rockets.add(new_rocket)
+        self.shot_sound.play()
+

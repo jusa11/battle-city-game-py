@@ -1,5 +1,5 @@
 import pygame
-from  config import  SCREEN_WIDTH, SCREEN_HEIGHT
+from configs.config import SCREEN_WIDTH, SCREEN_HEIGHT
 
 MAIN_TANK_STEP = 6
 MAIN_TANK_IMAGE = pygame.image.load('./images/main-tank.png')
