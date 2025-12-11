@@ -11,7 +11,7 @@ class EnemyTankSet(Tank):
         super().__init__(ENEMY_TANK_IMAGE, randint(10, SCREEN_WIDTH - 50), 450, choice([0, -90, 180, 90]))
 
     def handle_ai_input(self, action):
-        """Обработка событий от ИИ"""
+        """Обработка событий от AI"""
         pass
 
 
