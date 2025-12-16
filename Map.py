@@ -2,6 +2,7 @@ import pygame
 from configs.maps import level_1, level_2
 from configs.config import TILE_SIZE
 from Tile import Tile
+from MainTank import MainTank
 
 
 class Map(pygame.sprite.Sprite):
@@ -23,12 +24,16 @@ class Map(pygame.sprite.Sprite):
             screen.blit(tile.image, tile.rect)
 
 
-    def destruction_brick(self, rocket):
+    def destruction_brick(self, rocket, game):
         if rocket:
             for brick in self.tiles:
-                if rocket.rect.colliderect(brick.rect):
-                    # rocket.shell_explosion(self.screen)
+                if rocket.rect.colliderect(brick.rect) and rocket.alive:
                     rocket.destroy()
                     brick.kill()
                     break
+
+        if rocket and not rocket.alive:
+            rocket.shell_explosion(game)
+            if rocket.explosion_anim.finished:
+                MainTank.rocket = None
 

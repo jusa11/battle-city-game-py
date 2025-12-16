@@ -13,6 +13,7 @@ class EnemyTankSet(Tank):
         self.frame = 0
         self.tracks = ENEMY_TANK_FRAMES
         self.tracks_anim = Animation(self.tracks, 80)
+        self.alive = True
 
     def update(self):
         self.frame += 1

@@ -11,7 +11,7 @@ class MainTank(Tank):
         self.driving_tank_sound = pygame.mixer.Sound(
             file='./sounds/ride-tank.mp3')
         self.tracks = MAIN_TANK_FRAMES
-        self.tracks_anim = Animation(self.tracks, 80)
+        self.tracks_anim = Animation(self.tracks, 1)
 
     def handle_user_input(self):
         """Обработка событий нажатия на клавиши"""

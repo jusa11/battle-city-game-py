@@ -33,10 +33,10 @@ class GameSet:
 
         self.map.draw_map(self.screen)
 
-        self.map.destruction_brick(self.main_tank.rocket)
+        self.map.destruction_brick(self.main_tank.rocket, self.screen)
 
         # Респаун врагов
-        while len(self.enemy_tanks) < 1:
+        while len(self.enemy_tanks) < 4:
             self.spawn_enemy_tanks()
 
         # Движение врагов
@@ -45,34 +45,44 @@ class GameSet:
             enemy_tank.main_logic()
             enemy_tank.handle_ai_input()
             enemy_tank.move(self.main_tank, self.enemy_tanks, self.map)
-            self.draw_sprite(enemy_tank)
+            if enemy_tank.alive:
+                self.draw_sprite(enemy_tank)
+            else:
+                enemy_tank.tank_explosion(self.screen)
+                if enemy_tank.explosion_anim.finished:
+                    enemy_tank.kill()
 
         # Движение ракеты
-        if self.main_tank.rocket:
+        if self.main_tank.rocket and self.main_tank.rocket.alive:
             self.screen.blit(self.main_tank.rocket.img, (self.main_tank.rocket.x, self.main_tank.rocket.y))
             self.main_tank.rocket.shot()
             self.draw_sprite(self.main_tank.rocket)
 
         # Попадание ракеты
         rocket = self.main_tank.rocket
+
         if rocket:
             for enemy in self.enemy_tanks:
-                if rocket.rect.colliderect(enemy.rect):
-                    rocket.shell_explosion(self.screen)
-                    rocket.destroy()
-                    enemy.kill()
+                if rocket.rect.colliderect(enemy.rect) and rocket.alive:
+                    rocket.destroy()  # 🔥 ВАЖНО
+                    # enemy.kill()
+                    enemy.alive = False
                     self.game_score += 150
                     self.destroy_tank_sound.play()
                     break
 
-        if self.main_tank.rocket:
-            if not self.main_tank.rocket.alive:
+        # отрисовка взрыва
+        if self.main_tank.rocket and not self.main_tank.rocket.alive:
+            self.main_tank.rocket.shell_explosion(self.screen)
+            self.main_tank.tank_explosion(self.screen)
+            if self.main_tank.rocket.explosion_anim.finished:
                 self.main_tank.rocket = None
+
 
     def draw_sprite(self, sprite):
         image = sprite.img
 
-        # если у танка есть анимация гусениц
+        # анимация гусениц
         if hasattr(sprite, 'tracks_anim') and sprite.direction:
             image = sprite.tracks_anim.get_image()
 

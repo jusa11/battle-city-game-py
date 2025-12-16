@@ -1,6 +1,7 @@
 import  pygame
 from Rocket import RocketSet
-from configs.config import SCREEN_WIDTH, SCREEN_HEIGHT
+from Animation import Animation
+from configs.config import SCREEN_WIDTH, SCREEN_HEIGHT,KEY_TO_DIRECTION, TANK_EXPLOSION_FRAMES
 from configs.main_tank_config import MAIN_TANK_STEP
 
 
@@ -18,12 +19,10 @@ class Tank(pygame.sprite.Sprite):
         self.rocket = None
         self.is_collision = None
         self.shot_sound = pygame.mixer.Sound(file='./sounds/shot-gun.mp3')
-        self.key_to_direction = {
-            pygame.K_w: ('up', 0, (0, -1)),
-            pygame.K_s: ('down', 180, (0, 1)),
-            pygame.K_d: ('right', -90, (1, 0)),
-            pygame.K_a: ('left', 90, (-1, 0)),
-        }
+        self.key_to_direction = KEY_TO_DIRECTION
+        self.explosion_frames = TANK_EXPLOSION_FRAMES
+        self.explosion_anim = Animation(self.explosion_frames, 100, False)
+
 
     def set_action(self, action, is_key_up=False):
         if action == 'fire':
@@ -110,3 +109,8 @@ class Tank(pygame.sprite.Sprite):
         self.rocket = new_rocket
         self.shot_sound.play()
 
+    def tank_explosion(self, screen):
+        if self.explosion_anim and not self.explosion_anim.finished:
+            self.explosion_anim.update()
+            screen.blit(self.explosion_anim.get_image(),
+                    (self.x, self.y))
