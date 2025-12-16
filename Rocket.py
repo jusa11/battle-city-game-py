@@ -6,11 +6,12 @@ class RocketSet(pygame.sprite.Sprite):
     def __init__(self, x, y, angle):
         super().__init__()
         self.img = pygame.image.load('./images/rocket.png')
-        self.rect = self.img.get_rect()
+        self.rect = self.img.get_rect(topleft=(x, y))
         self.width, self.height = self.img.get_size()
         self.x = x
         self.y = y
         self.angle = angle
+        self.alive = True
         self.speed = ROCKET_SPEED
         self.destroy_tank_sound = pygame.mixer.Sound(
             file='./sounds/explosion-tank.mp3')
@@ -24,6 +25,9 @@ class RocketSet(pygame.sprite.Sprite):
             90: lambda: setattr(self, 'x', self.x - ROCKET_SPEED),
         }
 
+    def destroy(self):
+        self.alive = False
+
     def shot(self):
         if self.angle in self.possible_shot_directions:
             self.possible_shot_directions[self.angle]()
@@ -31,7 +35,7 @@ class RocketSet(pygame.sprite.Sprite):
             self.rect.y = self.y
 
             if self.is_off_screen():
-                self.kill()
+                self.alive = False
 
     def shell_explosion(self, screen):
         screen.blit(self.explosion_rocket_img,

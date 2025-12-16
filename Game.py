@@ -2,6 +2,7 @@ import pygame
 from configs.config import SCREEN_WIDTH, SCREEN_HEIGHT, BACKGROUND_FILL
 from MainTank import MainTank
 from EnemyTank import EnemyTankSet
+from Map import Map
 
 
 class GameSet:
@@ -14,6 +15,7 @@ class GameSet:
         self.game_over_rectangle = self.game_over_text.get_rect()
         self.main_tank = MainTank()
         self.enemy_tanks = pygame.sprite.Group()
+        self.map = Map()
         self.destroy_tank_sound = pygame.mixer.Sound(
             file='./sounds/explosion-tank.mp3')
 
@@ -26,41 +28,56 @@ class GameSet:
     def run(self):
         # Движение игрока
         self.main_tank.handle_user_input()
-        self.main_tank.move(self.main_tank, self.enemy_tanks)
+        self.main_tank.move(self.main_tank, self.enemy_tanks, self.map)
         self.draw_sprite(self.main_tank)
 
+        self.map.draw_map(self.screen)
+
+        self.map.destruction_brick(self.main_tank.rocket)
+
         # Респаун врагов
-        while len(self.enemy_tanks) < 2:
+        while len(self.enemy_tanks) < 1:
             self.spawn_enemy_tanks()
 
         # Движение врагов
         for enemy_tank in self.enemy_tanks:
-            # enemy_tank.handle_user_input()
-            enemy_tank.move(self.main_tank, self.enemy_tanks)
+            enemy_tank.update()
+            enemy_tank.main_logic()
+            enemy_tank.handle_ai_input()
+            enemy_tank.move(self.main_tank, self.enemy_tanks, self.map)
             self.draw_sprite(enemy_tank)
 
         # Движение ракеты
-        for rocket in self.main_tank.rockets:
-            self.screen.blit(rocket.img, (rocket.x, rocket.y))
-            rocket.shot()
-            # rocket.update()
-            self.draw_sprite(rocket)
+        if self.main_tank.rocket:
+            self.screen.blit(self.main_tank.rocket.img, (self.main_tank.rocket.x, self.main_tank.rocket.y))
+            self.main_tank.rocket.shot()
+            self.draw_sprite(self.main_tank.rocket)
 
         # Попадание ракеты
-        hits = pygame.sprite.groupcollide(
-            self.main_tank.rockets, self.enemy_tanks, True, True)
-        for rocket, enemies in hits.items():
-            rocket.shell_explosion(self.screen)
-            self.game_score += 150
-            self.destroy_tank_sound.play()
+        rocket = self.main_tank.rocket
+        if rocket:
+            for enemy in self.enemy_tanks:
+                if rocket.rect.colliderect(enemy.rect):
+                    rocket.shell_explosion(self.screen)
+                    rocket.destroy()
+                    enemy.kill()
+                    self.game_score += 150
+                    self.destroy_tank_sound.play()
+                    break
 
+        if self.main_tank.rocket:
+            if not self.main_tank.rocket.alive:
+                self.main_tank.rocket = None
 
     def draw_sprite(self, sprite):
-        rotated = pygame.transform.rotate(sprite.img, sprite.angle)
-        sprite.rect = rotated.get_rect(center=sprite.rect.center)
-        sprite.mask = pygame.mask.from_surface(rotated)
-        self.screen.blit(rotated, sprite.rect)
+        image = sprite.img
 
+        # если у танка есть анимация гусениц
+        if hasattr(sprite, 'tracks_anim') and sprite.direction:
+            image = sprite.tracks_anim.get_image()
+
+        rotated = pygame.transform.rotate(image, sprite.angle)
+        self.screen.blit(rotated, sprite.rect)
 
     def spawn_enemy_tanks(self):
         new_enemy_tank = EnemyTankSet()

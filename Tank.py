@@ -15,13 +15,14 @@ class Tank(pygame.sprite.Sprite):
         self.mask = pygame.mask.from_surface(self.img)
         self.angle = tank_angle
         self.direction = None
-        self.rockets = pygame.sprite.Group()
+        self.rocket = None
+        self.is_collision = None
         self.shot_sound = pygame.mixer.Sound(file='./sounds/shot-gun.mp3')
         self.key_to_direction = {
-            pygame.K_UP: ('up', 0, (0, -1)),
-            pygame.K_DOWN: ('down', 180, (0, 1)),
-            pygame.K_RIGHT: ('right', -90, (1, 0)),
-            pygame.K_LEFT: ('left', 90, (-1, 0)),
+            pygame.K_w: ('up', 0, (0, -1)),
+            pygame.K_s: ('down', 180, (0, 1)),
+            pygame.K_d: ('right', -90, (1, 0)),
+            pygame.K_a: ('left', 90, (-1, 0)),
         }
 
     def set_action(self, action, is_key_up=False):
@@ -36,55 +37,60 @@ class Tank(pygame.sprite.Sprite):
             if self.direction == direction:
                 self.direction = None
 
-
-    def move(self, main_tank, enemy_tanks):
+    def move(self, main_tank, enemy_tanks, map):
+        if self.tracks_anim:
+            self.tracks_anim.update()
         if not self.direction:
             return
 
-        # dx / dy
         _, _, (dx, dy) = next(
-            (v for k, v in self.key_to_direction.items() if v[0] == self.direction),
+            (v for v in self.key_to_direction.values() if v[0] == self.direction),
             (None, None, (0, 0))
         )
 
-        # сохраняем текущую позицию
         old_rect = self.rect.copy()
 
-        # двигаем
+        # движение
         self.rect.x += dx * MAIN_TANK_STEP
         self.rect.y += dy * MAIN_TANK_STEP
+
+        self.check_collision(main_tank, enemy_tanks, map, old_rect)
+        self.out_of_screen_restriction(old_rect)
         self.x, self.y = self.rect.topleft
 
-        self.out_of_screen_restriction(old_rect)
-        self.check_collision(main_tank, enemy_tanks, old_rect)
 
+    def check_collision(self, main_tank, enemy_tanks, map, old_rect):
+        # стены
+        if pygame.sprite.spritecollide(self, map.tiles, False):
+            self.rect = old_rect
+            self.is_collision = True
+            return
 
-    def check_collision(self, main_tank, enemy_tanks, old_rect):
-        # Проверка столкновения врагов друг с другом
-        for enemy_tank in enemy_tanks:
-            if enemy_tank is not self:
-                if pygame.sprite.collide_mask(self, enemy_tank):
-                    self.rect.topleft = old_rect.topleft
-                    self.x, self.y = old_rect.topleft
-                    return
+        # враги
+        for enemy in enemy_tanks:
+            if enemy is not self and self.rect.colliderect(enemy.rect):
+                self.rect = old_rect
+                self.is_collision = True
+                return
 
-        # Проверка столкновения с главным танком
-            if self is not main_tank:
-                if pygame.sprite.collide_mask(self, main_tank):
-                    self.rect.topleft = old_rect.topleft
-                    self.x, self.y = old_rect.topleft
-                    return
+        # главный танк
+        if self is not main_tank and self.rect.colliderect(main_tank.rect):
+            self.rect = old_rect
+            self.is_collision = True
+            return
 
     def out_of_screen_restriction(self, old_rect):
         """Не выходить за границы"""
-        if not (0 <= self.rect.x <= SCREEN_WIDTH - self.width):
-            self.rect.x = old_rect.x
-        if not (0 <= self.rect.y <= SCREEN_HEIGHT - self.height):
-            self.rect.y = old_rect.y
+        # границы экрана
+        if not (0 <= self.rect.x <= SCREEN_WIDTH - self.rect.width and
+                0 <= self.rect.y <= SCREEN_HEIGHT - self.rect.height):
+            self.rect = old_rect
+            self.is_collision = True
+            return
 
 
     def shot_gun(self):
-        if len(self.rockets) > 0:
+        if self.rocket:
             return
         """Выстрел пушки"""
         if self.angle == 0:
@@ -101,6 +107,6 @@ class Tank(pygame.sprite.Sprite):
             rocket_y = self.y + self.height // 2 - 4
 
         new_rocket = RocketSet(rocket_x, rocket_y, self.angle)
-        self.rockets.add(new_rocket)
+        self.rocket = new_rocket
         self.shot_sound.play()
 
