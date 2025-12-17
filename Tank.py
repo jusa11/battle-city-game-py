@@ -3,10 +3,11 @@ from Rocket import RocketSet
 from Animation import Animation
 from configs.config import SCREEN_WIDTH, SCREEN_HEIGHT,KEY_TO_DIRECTION, TANK_EXPLOSION_FRAMES
 from configs.main_tank_config import MAIN_TANK_STEP
+from configs.sounds import SHOT
 
 
 class Tank(pygame.sprite.Sprite):
-    def __init__(self, tank_img, tank_x, tank_y, tank_angle=0):
+    def __init__(self, tank_img, tank_x, tank_y, tracks, tank_angle=0):
         super().__init__()
         self.img = tank_img
         self.width, self.height = self.img.get_size()
@@ -15,11 +16,14 @@ class Tank(pygame.sprite.Sprite):
         self.rect = self.img.get_rect(topleft=(int(self.x), int(self.y)))   # координаты
         self.mask = pygame.mask.from_surface(self.img)
         self.angle = tank_angle
+        self.alive = True
         self.direction = None
         self.rocket = None
         self.is_collision = None
-        self.shot_sound = pygame.mixer.Sound(file='./sounds/shot-gun.mp3')
+        self.shot_sound = SHOT
         self.key_to_direction = KEY_TO_DIRECTION
+        self.tracks = tracks
+        self.tracks_anim = Animation(self.tracks, 30)
         self.explosion_frames = TANK_EXPLOSION_FRAMES
         self.explosion_anim = Animation(self.explosion_frames, 100, False)
 
@@ -36,11 +40,14 @@ class Tank(pygame.sprite.Sprite):
             if self.direction == direction:
                 self.direction = None
 
-    def move(self, main_tank, enemy_tanks, map):
-        if self.tracks_anim:
-            self.tracks_anim.update()
+    def move(self, main_tank, enemy_tanks, map, screen):
         if not self.direction:
             return
+
+        if self.tracks_anim:
+            self.tracks_anim.update()
+            screen.blit(self.tracks_anim.get_image(),
+                        (self.x, self.y))
 
         _, _, (dx, dy) = next(
             (v for v in self.key_to_direction.values() if v[0] == self.direction),
@@ -56,6 +63,7 @@ class Tank(pygame.sprite.Sprite):
         self.check_collision(main_tank, enemy_tanks, map, old_rect)
         self.out_of_screen_restriction(old_rect)
         self.x, self.y = self.rect.topleft
+
 
 
     def check_collision(self, main_tank, enemy_tanks, map, old_rect):
@@ -109,8 +117,20 @@ class Tank(pygame.sprite.Sprite):
         self.rocket = new_rocket
         self.shot_sound.play()
 
+
     def tank_explosion(self, screen):
         if self.explosion_anim and not self.explosion_anim.finished:
             self.explosion_anim.update()
             screen.blit(self.explosion_anim.get_image(),
                     (self.x, self.y))
+
+
+    def draw(self, screen):
+        if self.alive:
+            rotated = pygame.transform.rotate(self.img, self.angle)
+            screen.blit(rotated, self.rect)
+        else:
+            self.tank_explosion(screen)
+            if self.explosion_anim.finished:
+                self.kill()
+

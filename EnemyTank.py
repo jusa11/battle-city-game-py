@@ -1,6 +1,5 @@
 import pygame
 from Tank import Tank
-from Animation import Animation
 from random import randint, choice
 from configs.config import SCREEN_WIDTH
 from configs.enemy_tank_config import ENEMY_TANK_IMAGE, ENEMY_TANK_FRAMES
@@ -9,11 +8,8 @@ import sys
 
 class EnemyTankSet(Tank):
     def __init__(self):
-        super().__init__(ENEMY_TANK_IMAGE, randint(10, SCREEN_WIDTH - 50), 450, choice([0, -90, 180, 90]))
+        super().__init__(ENEMY_TANK_IMAGE, randint(10, SCREEN_WIDTH - 50), 450, ENEMY_TANK_FRAMES, choice([0, -90, 180, 90]))
         self.frame = 0
-        self.tracks = ENEMY_TANK_FRAMES
-        self.tracks_anim = Animation(self.tracks, 80)
-        self.alive = True
 
     def update(self):
         self.frame += 1

@@ -1,6 +1,7 @@
 import pygame
 from Animation import Animation
 from configs.config import SCREEN_WIDTH, SCREEN_HEIGHT, ROCKET_SPEED, ROCKET_EXPLOSION_FRAMES
+from configs.sounds import DESTROY_TANK_SOUND
 
 
 class RocketSet(pygame.sprite.Sprite):
@@ -13,11 +14,9 @@ class RocketSet(pygame.sprite.Sprite):
         self.y = y
         self.angle = angle
         self.alive = True
-        self.speed = ROCKET_SPEED
+        self.destroy_tank_sound = DESTROY_TANK_SOUND
         self.explosion_frames = ROCKET_EXPLOSION_FRAMES
         self.explosion_anim = Animation(self.explosion_frames, 30, False)
-        self.destroy_tank_sound = pygame.mixer.Sound(
-            file='./sounds/explosion-tank.mp3')
         self.explosion_rocket_img = pygame.image.load(
             './images/explosion_rocket.png')
         self.explosion_rocket_width, self.explosion_rocket_height = self.explosion_rocket_img.get_size()
@@ -28,19 +27,37 @@ class RocketSet(pygame.sprite.Sprite):
             90: lambda: setattr(self, 'x', self.x - ROCKET_SPEED),
         }
 
+    def move(self):
+        if self.alive:
+            if self.angle in self.possible_shot_directions:
+                self.possible_shot_directions[self.angle]()
+                self.rect.x = self.x
+                self.rect.y = self.y
+
+                if self.is_off_screen():
+                    self.alive = False
+
+
+    def hit_rocket(self, enemies, game_score, screen, player):
+        """Попадание снаряда"""
+        for enemy in enemies:
+            if self.rect.colliderect(enemy.rect) and self.alive:
+                self.destroy()
+                enemy.alive = False
+                game_score['score'] += 150
+                self.destroy_tank_sound.play()
+                break
+
+        if not self.alive:
+           self.shell_explosion(screen)
+           player.tank_explosion(screen)
+           if self.explosion_anim.finished:
+               player.rocket = None
+
+
     def destroy(self):
         self.alive = False
 
-    def shot(self):
-        if not self.alive:
-            return
-        if self.angle in self.possible_shot_directions:
-            self.possible_shot_directions[self.angle]()
-            self.rect.x = self.x
-            self.rect.y = self.y
-
-            if self.is_off_screen():
-                self.alive = False
 
     def shell_explosion(self, screen):
         if self.explosion_anim and not self.explosion_anim.finished:
@@ -51,3 +68,9 @@ class RocketSet(pygame.sprite.Sprite):
     def is_off_screen(self):
         return (self.y < 0 or self.y > SCREEN_HEIGHT - self.height or
                 self.x < 0 or self.x > SCREEN_WIDTH - self.width)
+
+
+    def draw(self, screen):
+        if self.alive:
+            rotated = pygame.transform.rotate(self.img, self.angle)
+            screen.blit(rotated, self.rect)
