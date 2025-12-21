@@ -30,25 +30,27 @@ class GameSet:
         # Движение ракеты
         if self.player.rocket:
             self.player.rocket.move()
-            self.player.rocket.hit_rocket(self.enemies, self.info.game_info, self.screen, self.player)
+            self.player.rocket.hit_rocket(self.enemies, self.info.game_info, self.player)
+
+        if self.player.rocket and self.player.rocket.explosion_anim.finished:
+            self.player.rocket = None
 
         # Респаун врагов
-        while len(self.enemies) < 4:
+        while len(self.enemies) < 1:
             self.spawn_enemy_tanks()
-
-        self.map.destruction_brick(self.player.rocket, self.screen)
+        self.map.destruction_brick(self.player.rocket, self.screen, self.player.shot_direction)
 
 
     def draw(self):
+        self.map.draw(self.screen)
+
         self.player.draw(self.screen)
 
         for enemy in self.enemies:
             enemy.draw(self.screen)
 
-        self.map.draw_map(self.screen)
-
-        if self.player.rocket and self.player.rocket.alive:
-            self.player.rocket.draw(self.screen)
+        if self.player.rocket:
+            self.player.rocket.draw(self.screen, self.player)
 
         self.info.show(self.screen)
 

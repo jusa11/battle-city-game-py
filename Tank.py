@@ -26,6 +26,7 @@ class Tank(pygame.sprite.Sprite):
         self.tracks_anim = Animation(self.tracks, 30)
         self.explosion_frames = TANK_EXPLOSION_FRAMES
         self.explosion_anim = Animation(self.explosion_frames, 100, False)
+        self.shot_direction = None
 
 
     def set_action(self, action, is_key_up=False):
@@ -44,11 +45,6 @@ class Tank(pygame.sprite.Sprite):
         if not self.direction:
             return
 
-        if self.tracks_anim:
-            self.tracks_anim.update()
-            screen.blit(self.tracks_anim.get_image(),
-                        (self.x, self.y))
-
         _, _, (dx, dy) = next(
             (v for v in self.key_to_direction.values() if v[0] == self.direction),
             (None, None, (0, 0))
@@ -61,14 +57,14 @@ class Tank(pygame.sprite.Sprite):
         self.rect.y += dy * MAIN_TANK_STEP
 
         self.check_collision(main_tank, enemy_tanks, map, old_rect)
-        self.out_of_screen_restriction(old_rect)
+        self.out_of_screen(old_rect)
         self.x, self.y = self.rect.topleft
 
 
 
     def check_collision(self, main_tank, enemy_tanks, map, old_rect):
         # стены
-        if pygame.sprite.spritecollide(self, map.tiles, False):
+        if pygame.sprite.spritecollide(self, map.tiles, False, pygame.sprite.collide_mask):
             self.rect = old_rect
             self.is_collision = True
             return
@@ -86,7 +82,7 @@ class Tank(pygame.sprite.Sprite):
             self.is_collision = True
             return
 
-    def out_of_screen_restriction(self, old_rect):
+    def out_of_screen(self, old_rect):
         """Не выходить за границы"""
         # границы экрана
         if not (0 <= self.rect.x <= SCREEN_WIDTH - self.rect.width and
@@ -101,15 +97,19 @@ class Tank(pygame.sprite.Sprite):
             return
         """Выстрел пушки"""
         if self.angle == 0:
+            self.shot_direction = 'bottom'
             rocket_x = self.x + self.width // 2 - 4
             rocket_y = self.y - 10
         elif self.angle == 180:
+            self.shot_direction = 'top'
             rocket_x = self.x + self.width // 2 - 4
             rocket_y = self.y + self.height
         elif self.angle == 90:
+            self.shot_direction = 'right'
             rocket_x = self.x - 10
             rocket_y = self.y + self.height // 2 - 4
         elif self.angle == -90:
+            self.shot_direction = 'left'
             rocket_x = self.x + self.width
             rocket_y = self.y + self.height // 2 - 4
 
@@ -129,6 +129,11 @@ class Tank(pygame.sprite.Sprite):
         if self.alive:
             rotated = pygame.transform.rotate(self.img, self.angle)
             screen.blit(rotated, self.rect)
+
+            if self.tracks_anim and self.direction:
+                self.tracks_anim.update()
+                screen.blit(self.tracks_anim.get_image(),
+                            (self.x, self.y))
         else:
             self.tank_explosion(screen)
             if self.explosion_anim.finished:

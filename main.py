@@ -20,4 +20,3 @@ while True:
     game.draw()
     pygame.display.update()
     clock.tick(60)
-

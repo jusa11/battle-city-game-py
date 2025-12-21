@@ -12,6 +12,7 @@ class RocketSet(pygame.sprite.Sprite):
         self.width, self.height = self.img.get_size()
         self.x = x
         self.y = y
+        self.mask = pygame.mask.from_surface(self.img)
         self.angle = angle
         self.alive = True
         self.destroy_tank_sound = DESTROY_TANK_SOUND
@@ -34,11 +35,11 @@ class RocketSet(pygame.sprite.Sprite):
                 self.rect.x = self.x
                 self.rect.y = self.y
 
-                if self.is_off_screen():
+                if self.out_of_screen():
                     self.alive = False
 
 
-    def hit_rocket(self, enemies, game_score, screen, player):
+    def hit_rocket(self, enemies, game_score, player):
         """Попадание снаряда"""
         for enemy in enemies:
             if self.rect.colliderect(enemy.rect) and self.alive:
@@ -47,13 +48,8 @@ class RocketSet(pygame.sprite.Sprite):
                 game_score['score'] += 150
                 self.destroy_tank_sound.play()
                 break
-
-        if not self.alive:
-           self.shell_explosion(screen)
-           player.tank_explosion(screen)
-           if self.explosion_anim.finished:
-               player.rocket = None
-
+            if self.explosion_anim.finished:
+                self.kill()
 
     def destroy(self):
         self.alive = False
@@ -65,12 +61,15 @@ class RocketSet(pygame.sprite.Sprite):
             screen.blit(self.explosion_anim.get_image(),
                     (self.x, self.y))
 
-    def is_off_screen(self):
+    def out_of_screen(self):
         return (self.y < 0 or self.y > SCREEN_HEIGHT - self.height or
                 self.x < 0 or self.x > SCREEN_WIDTH - self.width)
 
 
-    def draw(self, screen):
+    def draw(self, screen, player):
         if self.alive:
             rotated = pygame.transform.rotate(self.img, self.angle)
             screen.blit(rotated, self.rect)
+        if not self.alive:
+            self.shell_explosion(screen)
+            player.tank_explosion(screen)
