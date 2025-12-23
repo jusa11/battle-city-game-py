@@ -1,7 +1,8 @@
 import pygame
 from configs.brick_confing import parts
+from configs.config import TILE_SIZE
 
-class Tile(pygame.sprite.Sprite):
+class BricksTile(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
         self.parts = parts
@@ -17,13 +18,13 @@ class Tile(pygame.sprite.Sprite):
         }
 
     def collect_parts(self):
-        surface = pygame.Surface((64, 64), pygame.SRCALPHA)
+        surface = pygame.Surface((TILE_SIZE, TILE_SIZE), pygame.SRCALPHA)
         for i, alive in enumerate(self.parts_alive):
             if alive:
                 col = i % 4
                 row = i // 4
-                x = col * 16
-                y = row * 16
+                x = col * (TILE_SIZE // 4)
+                y = row * (TILE_SIZE // 4)
                 surface.blit(self.parts[i], (x, y))
         return surface
 
@@ -32,6 +33,7 @@ class Tile(pygame.sprite.Sprite):
             return
 
         current_row = self.sides[side][0]
+
         if any(self.parts_alive[i] for i in current_row):
             for i in current_row:
                 self.parts_alive[i] = False
@@ -41,7 +43,6 @@ class Tile(pygame.sprite.Sprite):
             self.image = self.collect_parts()
             self.mask = pygame.mask.from_surface(self.image)
 
-            # если все куски разрушены
             if not any(self.parts_alive):
                 self.kill()
 

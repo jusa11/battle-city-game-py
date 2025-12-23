@@ -1,7 +1,7 @@
 import pygame
 from configs.maps import level_1
 from configs.config import TILE_SIZE
-from Tile import Tile
+from BricksTile import BricksTile
 
 class Map(pygame.sprite.Sprite):
     def __init__(self):
@@ -12,21 +12,17 @@ class Map(pygame.sprite.Sprite):
                 if tile == 1:
                     x = col_index * TILE_SIZE
                     y = row_index * TILE_SIZE
-                    self.tiles.add(Tile(x, y))
+                    self.tiles.add(BricksTile(x, y))
 
     def draw(self, screen):
         for tile in self.tiles:
             screen.blit(tile.image, tile.rect)
 
-    def destruction_brick(self, rocket, screen, destruct_side):
-        if rocket is None or not rocket.alive:
-            return
-
-        for brick in self.tiles:
-            if pygame.sprite.collide_mask(rocket, brick):
+    def destruction_brick(self, rocket, destruct_side):
+          for brick in self.tiles:
+            if rocket.rect.colliderect(brick.rect):
+                print(f"Столкновение с кирпичом, side={destruct_side}, parts_alive={brick.parts_alive}")
                 brick.destroy_side(destruct_side)
                 rocket.destroy()
                 break
 
-        if not rocket.alive:
-            rocket.shell_explosion(screen)

@@ -39,7 +39,7 @@ class RocketSet(pygame.sprite.Sprite):
                     self.alive = False
 
 
-    def hit_rocket(self, enemies, game_score, player):
+    def hit_rocket(self, enemies, game_score):
         """Попадание снаряда"""
         for enemy in enemies:
             if self.rect.colliderect(enemy.rect) and self.alive:
@@ -59,17 +59,16 @@ class RocketSet(pygame.sprite.Sprite):
         if self.explosion_anim and not self.explosion_anim.finished:
             self.explosion_anim.update()
             screen.blit(self.explosion_anim.get_image(),
-                    (self.x, self.y))
+                    (self.x -22, self.y - 22))
 
     def out_of_screen(self):
         return (self.y < 0 or self.y > SCREEN_HEIGHT - self.height or
                 self.x < 0 or self.x > SCREEN_WIDTH - self.width)
 
 
-    def draw(self, screen, player):
+    def draw(self, screen):
         if self.alive:
             rotated = pygame.transform.rotate(self.img, self.angle)
             screen.blit(rotated, self.rect)
         if not self.alive:
             self.shell_explosion(screen)
-            player.tank_explosion(screen)

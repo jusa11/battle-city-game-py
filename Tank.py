@@ -13,7 +13,7 @@ class Tank(pygame.sprite.Sprite):
         self.width, self.height = self.img.get_size()
         self.x = tank_x
         self.y = tank_y
-        self.rect = self.img.get_rect(topleft=(int(self.x), int(self.y)))   # координаты
+        self.rect = self.img.get_rect(topleft=(int(self.x), int(self.y)))
         self.mask = pygame.mask.from_surface(self.img)
         self.angle = tank_angle
         self.alive = True
@@ -99,18 +99,18 @@ class Tank(pygame.sprite.Sprite):
         if self.angle == 0:
             self.shot_direction = 'bottom'
             rocket_x = self.x + self.width // 2 - 4
-            rocket_y = self.y - 10
+            rocket_y = self.y + 15
         elif self.angle == 180:
             self.shot_direction = 'top'
             rocket_x = self.x + self.width // 2 - 4
-            rocket_y = self.y + self.height
+            rocket_y = self.y - 15
         elif self.angle == 90:
             self.shot_direction = 'right'
-            rocket_x = self.x - 10
+            rocket_x = self.x + 15
             rocket_y = self.y + self.height // 2 - 4
         elif self.angle == -90:
             self.shot_direction = 'left'
-            rocket_x = self.x + self.width
+            rocket_x = self.x - 15
             rocket_y = self.y + self.height // 2 - 4
 
         new_rocket = RocketSet(rocket_x, rocket_y, self.angle)
