@@ -1,7 +1,7 @@
 import  pygame
 from Rocket import RocketSet
 from Animation import Animation
-from configs.config import SCREEN_WIDTH, SCREEN_HEIGHT,KEY_TO_DIRECTION, TANK_EXPLOSION_FRAMES
+from configs.config import SCREEN_WIDTH, SCREEN_HEIGHT,KEY_TO_DIRECTION, TANK_EXPLOSION_FRAMES, TILE_SIZE
 from configs.main_tank_config import MAIN_TANK_STEP
 from configs.sounds import SHOT
 
@@ -23,28 +23,28 @@ class Tank(pygame.sprite.Sprite):
         self.shot_sound = SHOT
         self.key_to_direction = KEY_TO_DIRECTION
         self.tracks = tracks
-        self.tracks_anim = Animation(self.tracks, 30)
+        self.tracks_anim = Animation(self.tracks, 10)
         self.explosion_frames = TANK_EXPLOSION_FRAMES
         self.explosion_anim = Animation(self.explosion_frames, 100, False)
         self.shot_direction = None
+        self.old_direction = None
 
 
     def set_action(self, action, is_key_up=False):
         if action == 'fire':
             self.shot_gun()
+
         if action in self.key_to_direction:
             direction, angle, _ = self.key_to_direction[action]
             self.direction = direction
             self.angle = angle
+
         if is_key_up and action in self.key_to_direction:
             direction, _, _ = self.key_to_direction[action]
             if self.direction == direction:
                 self.direction = None
 
-    def move(self, main_tank, enemy_tanks, map, screen):
-        if not self.direction:
-            return
-
+    def move(self, main_tank, enemy_tanks, map):
         _, _, (dx, dy) = next(
             (v for v in self.key_to_direction.values() if v[0] == self.direction),
             (None, None, (0, 0))
@@ -52,14 +52,21 @@ class Tank(pygame.sprite.Sprite):
 
         old_rect = self.rect.copy()
 
-        # движение
+        if self.direction != self.old_direction:
+            if self.direction in ['left', 'right']:
+                self.rect.y = round(self.rect.y / TILE_SIZE) * TILE_SIZE
+            elif self.direction in ['up', 'down']:
+                self.rect.x = round(self.rect.x / TILE_SIZE) * TILE_SIZE
+
+        self.old_direction = self.old_direction
+
         self.rect.x += dx * MAIN_TANK_STEP
         self.rect.y += dy * MAIN_TANK_STEP
 
         self.check_collision(main_tank, enemy_tanks, map, old_rect)
         self.out_of_screen(old_rect)
-        self.x, self.y = self.rect.topleft
 
+        self.x, self.y = self.rect.topleft
 
 
     def check_collision(self, main_tank, enemy_tanks, map, old_rect):
@@ -81,6 +88,7 @@ class Tank(pygame.sprite.Sprite):
             self.rect = old_rect
             self.is_collision = True
             return
+
 
     def out_of_screen(self, old_rect):
         """Не выходить за границы"""
@@ -132,7 +140,9 @@ class Tank(pygame.sprite.Sprite):
 
             if self.tracks_anim and self.direction:
                 self.tracks_anim.update()
-                screen.blit(self.tracks_anim.get_image(),
+                img = self.tracks_anim.get_image()
+                rotated = pygame.transform.rotate(img, self.angle)
+                screen.blit(rotated,
                             (self.x, self.y))
         else:
             self.tank_explosion(screen)

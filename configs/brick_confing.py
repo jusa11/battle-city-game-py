@@ -18,3 +18,6 @@ img_15 = pygame.image.load('./images/tile_brick/tile_bricks_15.gif')
 img_16 = pygame.image.load('./images/tile_brick/tile_bricks_16.gif')
 
 parts = [img_1, img_2, img_3, img_4, img_5, img_6, img_7, img_8, img_9, img_10, img_11, img_12, img_13, img_14, img_15, img_16, ]
+
+concrete_tile = pygame.image.load('./images/concrete-tile.png')
+forest_tile = pygame.image.load('./images/forest-tile.png')

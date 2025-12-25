@@ -18,14 +18,16 @@ class GameSet:
     def update(self):
         # Движение игрока
         self.player.handle_user_input()
-        self.player.move(self.player, self.enemies, self.map, self.screen)
+        self.player.move(self.player, self.enemies, self.map)
+
 
         # Движение врагов
         for enemy in self.enemies:
             enemy.update()
             enemy.main_logic()
             enemy.handle_ai_input()
-            enemy.move(self.player, self.enemies, self.map, self.screen)
+            enemy.move(self.player, self.enemies, self.map)
+
 
         # Движение ракеты
         if self.player.rocket:
@@ -36,25 +38,26 @@ class GameSet:
             self.player.rocket = None
 
         # Респаун врагов
-        while len(self.enemies) < 1:
+        while len(self.enemies) < 3:
             self.spawn_enemy_tanks()
 
         if self.player.rocket and self.player.rocket.alive:
             self.map.destruction_brick(self.player.rocket, self.player.shot_direction)
 
 
-    def draw(self):
-        self.map.draw(self.screen)
 
+    def draw(self):
         self.player.draw(self.screen)
 
         for enemy in self.enemies:
             enemy.draw(self.screen)
 
+        self.map.draw(self.screen)
         if self.player.rocket:
             self.player.rocket.draw(self.screen)
 
         self.info.show(self.screen)
+        # self.draw_grid(self.screen)
 
 
     def spawn_enemy_tanks(self):
@@ -62,3 +65,12 @@ class GameSet:
         self.enemies.add(new_enemy_tank)
 
 
+    # def draw_grid(self, screen, grid_size=64, color=(255, 255, 255)):
+    #     """Отрисовка сетки на карте 64х64"""
+    #     width, height = screen.get_size()
+    #
+    #     for x in range(0, width, grid_size):
+    #         pygame.draw.line(screen, color, (x, 0), (x, height), 1)
+    #
+    #     for y in range(0, height, grid_size):
+    #         pygame.draw.line(screen, color, (0, y), (width, y), 1)
