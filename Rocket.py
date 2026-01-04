@@ -39,15 +39,24 @@ class RocketSet(pygame.sprite.Sprite):
                     self.alive = False
 
 
-    def hit_rocket(self, enemies, game_score):
+    def hit_rocket(self, enemies=None, player=None, game_score=None):
         """Попадание снаряда"""
-        for enemy in enemies:
-            if self.rect.colliderect(enemy.rect) and self.alive:
+        if enemies:
+            for enemy in enemies:
+                if self.rect.colliderect(enemy.rect) and self.alive:
+                    self.destroy()
+                    enemy.alive = False
+                    game_score['score'] += 150
+                    self.destroy_tank_sound.play()
+                    break
+                if self.explosion_anim.finished:
+                    self.kill()
+
+        if player:
+            if self.rect.colliderect(player.rect) and self.alive:
                 self.destroy()
-                enemy.alive = False
-                game_score['score'] += 150
+                player.alive = False
                 self.destroy_tank_sound.play()
-                break
             if self.explosion_anim.finished:
                 self.kill()
 

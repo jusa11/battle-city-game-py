@@ -28,6 +28,7 @@ class Tank(pygame.sprite.Sprite):
         self.explosion_anim = Animation(self.explosion_frames, 100, False)
         self.shot_direction = None
         self.old_direction = None
+        self.coordinates = None
 
 
     def set_action(self, action, is_key_up=False):
@@ -67,6 +68,7 @@ class Tank(pygame.sprite.Sprite):
         self.out_of_screen(old_rect)
 
         self.x, self.y = self.rect.topleft
+        self.coordinates = (round(self.rect.x / TILE_SIZE), round(self.rect.y / TILE_SIZE))
 
 
     def check_collision(self, main_tank, enemy_tanks, map, old_rect):

@@ -1,5 +1,5 @@
 import pygame
-from configs.maps import level_1, level_3
+from configs.maps import level_1, level_3, level_4
 from configs.config import TILE_SIZE
 from configs.brick_confing import concrete_tile, forest_tile
 from BricksTile import BricksTile
@@ -10,7 +10,7 @@ class Map(pygame.sprite.Sprite):
         super().__init__()
         self.tiles = pygame.sprite.Group()
         self.not_tile = pygame.sprite.Group()
-        for row_index, row in enumerate(level_1):
+        for row_index, row in enumerate(level_4):
             for col_index, tile in enumerate(row):
                 if tile == 1:
                     x = col_index * TILE_SIZE
