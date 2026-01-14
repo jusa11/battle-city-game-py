@@ -4,7 +4,7 @@ from EnemyTank import EnemyTankSet
 from Map import Map
 from GameInfo import Info
 from configs.config import SCREEN_WIDTH, SCREEN_HEIGHT
-from random import choice
+
 
 class GameSet:
     def __init__(self):
@@ -12,9 +12,10 @@ class GameSet:
         self.player = MainTank()
         self.enemies = pygame.sprite.Group()
         self.map = Map()
-        self.info = Info()
+        self.game_info = Info()
         self.timer = 0
         self.current_phase = None
+
 
     def get_period(self):
         # if self.timer < 300:
@@ -31,69 +32,43 @@ class GameSet:
 
 
     def update(self):
-        # Воскрешение
-        if not self.player.alive:
-            possible = [50, 100, 150, 200]
-            if self.timer % choice(possible) == 0:
-                self.player.alive = True
+        context = {
+            'player': self.player,
+            'enemies': self.enemies,
+            'map': self.map,
+            'timer': self.timer,
+            'score': self.game_info.score,
+            'current_phase': self.current_phase,
 
-        # Движение игрока
-        self.player.handle_user_input()
-        self.player.move(self.player, self.enemies, self.map)
+        }
+
+        self.player.update(context)
+
+        for enemy in self.enemies:
+            enemy.update(context)
+
+
         self.timer += 1
-
         self.get_period()
 
-        # Движение врагов
-        for enemy in self.enemies:
-            enemy.update()
-            enemy.move(self.player, self.enemies, self.map)
-            enemy.main_logic(self.current_phase, self.player.coordinates)
-            enemy.handle_ai_input()
-
-            if enemy.rocket:
-                enemy.rocket.move()
-                enemy.rocket.hit_rocket(player=self.player)
-                print(enemy.rocket)
-
-                if enemy.rocket and enemy.rocket.explosion_anim.finished:
-                    enemy.rocket = None
-
-                if enemy.rocket and enemy.rocket.alive:
-                    self.map.destruction_brick(enemy.rocket, enemy.shot_direction)
-
-
-        # Движение ракеты
-        if self.player.rocket:
-            self.player.rocket.move()
-            self.player.rocket.hit_rocket(enemies=self.enemies, game_score=self.info.game_info)
-
-        if self.player.rocket and self.player.rocket.explosion_anim.finished:
-            self.player.rocket = None
-
         # Респаун врагов
-        while len(self.enemies) < 1:
+        while len(self.enemies) < 2:
             self.spawn_enemy_tanks()
-
-        if self.player.rocket and self.player.rocket.alive:
-            self.map.destruction_brick(self.player.rocket, self.player.shot_direction)
 
 
     def draw(self):
         self.player.draw(self.screen)
+        if self.player.weapon.rocket:
+            self.player.weapon.rocket.draw(self.screen)
 
         for enemy in self.enemies:
             enemy.draw(self.screen)
-            if enemy.rocket:
-                enemy.rocket.draw(self.screen)
+            if enemy.weapon.rocket:
+                enemy.weapon.rocket.draw(self.screen)
 
         self.map.draw(self.screen)
-        if self.player.rocket:
-            self.player.rocket.draw(self.screen)
 
-
-
-        self.info.show(self.screen)
+        self.game_info.show(self.screen)
         # self.draw_grid(self.screen)
 
 
