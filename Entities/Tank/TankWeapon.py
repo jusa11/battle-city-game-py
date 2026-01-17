@@ -1,5 +1,4 @@
-import  pygame
-from Rocket import RocketSet
+from Entities.Rocket.Rocket import Rocket
 from configs.sounds import SHOT
 
 
@@ -38,6 +37,6 @@ class Weapon():
             rocket_x = tank_x - 15
             rocket_y = tank_y + tank_height // 2 - 4
 
-        new_rocket = RocketSet(rocket_x, rocket_y, angle)
+        new_rocket = Rocket(rocket_x, rocket_y, angle)
         self.rocket = new_rocket
         self.shot_sound.play()
