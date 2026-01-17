@@ -1,10 +1,10 @@
 from configs.config import TILE_SIZE
 from configs.main_tank_config import MAIN_TANK_STEP
-from Entities.Tank.Collisions import Collisions
+from system.TankCollisions import TankCollisions
 
 class TankMovement:
     def __init__(self):
-        self.collisions = Collisions()
+        self.collisions = TankCollisions()
 
 
     def move(self, tank, enemies, map, player=None):

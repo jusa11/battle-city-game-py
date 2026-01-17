@@ -2,8 +2,8 @@ import pygame
 from configs.maps import level_1, level_3, level_4, level_5
 from configs.config import TILE_SIZE
 from configs.brick_confing import concrete_tile, forest_tile
-from BricksTile import BricksTile
-from Tile import Tile
+from world.BricksTile import BricksTile
+from world.Tile import Tile
 
 class Map(pygame.sprite.Sprite):
     def __init__(self):

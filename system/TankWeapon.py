@@ -1,4 +1,4 @@
-from Entities.Rocket.Rocket import Rocket
+from entities.Projectile import Projectile
 from configs.sounds import SHOT
 
 
@@ -37,6 +37,6 @@ class TankWeapon():
             rocket_x = tank_x - 15
             rocket_y = tank_y + tank_height // 2 - 4
 
-        new_rocket = Rocket(rocket_x, rocket_y, angle)
+        new_rocket = Projectile(rocket_x, rocket_y, angle)
         self.rocket = new_rocket
         self.shot_sound.play()

@@ -1,8 +1,9 @@
 import pygame
-from MainTank import MainTank
-from EnemyTank import EnemyTankSet
-from Map import Map
-from GameInfo import Info
+from entities.MainTank import MainTank
+from entities.EnemyTank import EnemyTankSet
+from world.Map import Map
+from world.GameInfo import Info
+from core.GameContext import GameContext
 from configs.config import SCREEN_WIDTH, SCREEN_HEIGHT
 
 
@@ -32,15 +33,7 @@ class GameSet:
 
 
     def update(self):
-        context = {
-            'player': self.player,
-            'enemies': self.enemies,
-            'map': self.map,
-            'timer': self.timer,
-            'score': self.game_info.score,
-            'current_phase': self.current_phase,
-
-        }
+        context = GameContext(self.player, self.enemies, self.map, self.timer, self.game_info.score, self.current_phase)
 
         self.player.update(context)
 

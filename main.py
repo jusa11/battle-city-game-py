@@ -3,7 +3,7 @@ pygame.init()
 pygame.mixer.init()
 from configs.sounds import load_sounds
 load_sounds()
-from Game import GameSet
+from core.Game import GameSet
 from configs.sounds import START_GAME
 
 game = GameSet()

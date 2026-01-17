@@ -1,7 +1,7 @@
 import sys
 import pygame
 
-class InputSystem:
+class PlayerInput:
     def tank_driving(self, tank):
         """Обработка ввода"""
         for event in pygame.event.get():

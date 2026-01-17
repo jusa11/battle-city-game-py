@@ -1,11 +1,11 @@
 import pygame
-from Entities.Rocket.RocketMovement import RocketMovement
-from Entities.Rocket.RocketHit import RocketHit
-from Entities.Rocket.RocketExplosion import RocketExplosion
+from system.RocketMovement import RocketMovement
+from system.RocketHit import RocketHit
+from system.RocketExplosion import RocketExplosion
 from configs.config import ROCKET_SPEED
 
 
-class Rocket(pygame.sprite.Sprite):
+class Projectile(pygame.sprite.Sprite):
     def __init__(self, x, y, angle):
         super().__init__()
         self.img = pygame.image.load('./images/rocket.png')

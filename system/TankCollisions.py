@@ -1,7 +1,7 @@
 import pygame
 from configs.config import SCREEN_WIDTH, SCREEN_HEIGHT
 
-class Collisions():
+class TankCollisions():
     def __init__(self):
         super().__init__()
 

@@ -1,9 +1,9 @@
 import pygame
-from Entities.Tank.Tank import Tank
+from entities.Tank import Tank
 from random import randint, choice
 from configs.config import SCREEN_WIDTH
 from configs.enemy_tank_config import ENEMY_TANK_IMAGE, ENEMY_TANK_FRAMES
-from Entities.Tank.TankMovement import TankMovement
+from system.TankMovement import TankMovement
 
 class EnemyTankSet(Tank):
     def __init__(self):
@@ -17,11 +17,6 @@ class EnemyTankSet(Tank):
     def update(self, context):
         self.frame += 1
 
-        player = context['player']
-        map = context['map']
-        enemies = context['enemies']
-        phase = context['current_phase']
-
         # if self.is_collision:
         #     possible = [60, 120, 180, 240]
         #     if self.frame % choice(possible) == 0:
@@ -31,26 +26,26 @@ class EnemyTankSet(Tank):
         #     self.random_phase()
 
         self.handle_ai_input()
-        self.movement.move(self, enemies, map, player)
+        self.movement.move(self, context.enemies, context.map, context.player)
 
         if self.weapon.rocket:
-            self.weapon.rocket.update(player=player)
+            self.weapon.rocket.update(player=context.player)
 
 
             if self.weapon.rocket and self.weapon.rocket.explosion.explosion_anim.finished:
                 self.weapon.rocket = None
 
             if self.weapon.rocket and self.weapon.rocket.alive:
-                map.destruction_brick(self.weapon.rocket, self.weapon.shot_direction)
+                context.map.destruction_brick(self.weapon.rocket, self.weapon.shot_direction)
 
 
         self.random_shot()
 
-        if phase == 'random':
+        if context.phase == 'random':
             self.random_phase()
-        if phase  == 'chase':
+        if context.phase  == 'chase':
             if self.coordinates != self.old_coordinates:
-                self.chase_phase(player.coordinates)
+                self.chase_phase(context.player.coordinates)
 
 
     def handle_ai_input(self):

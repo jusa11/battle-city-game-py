@@ -1,7 +1,7 @@
 import  pygame
-from Animation import Animation
-from Entities.Tank.TankWeapon import TankWeapon
-from Entities.Tank.TankExplosion import TankExplosion
+from system.Animation import Animation
+from system.TankWeapon import TankWeapon
+from system.TankExplosion import TankExplosion
 from configs.config import KEY_TO_DIRECTION
 
 
