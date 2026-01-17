@@ -47,7 +47,6 @@ class GameSet:
         for enemy in self.enemies:
             enemy.update(context)
 
-
         self.timer += 1
         self.get_period()
 

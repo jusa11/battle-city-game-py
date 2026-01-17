@@ -1,7 +1,8 @@
 import  pygame
 from Animation import Animation
-from Entities.Weapon import Weapon
-from configs.config import KEY_TO_DIRECTION, TANK_EXPLOSION_FRAMES
+from Entities.Tank.TankWeapon import TankWeapon
+from Entities.Tank.TankExplosion import TankExplosion
+from configs.config import KEY_TO_DIRECTION
 
 
 class Tank(pygame.sprite.Sprite):
@@ -20,12 +21,11 @@ class Tank(pygame.sprite.Sprite):
         self.key_to_direction = KEY_TO_DIRECTION
         self.tracks = tracks
         self.tracks_anim = Animation(self.tracks, 10)
-        self.explosion_frames = TANK_EXPLOSION_FRAMES
-        self.explosion_anim = Animation(self.explosion_frames, 100, False)
+        self.explosion = TankExplosion()
         self.old_direction = None
         self.coordinates = None
-        self.weapon = Weapon()
         self.old_rect = None
+        self.weapon = TankWeapon()
 
 
     def set_action(self, action, is_key_up=False):
@@ -50,13 +50,6 @@ class Tank(pygame.sprite.Sprite):
                 self.direction = None
 
 
-    def tank_explosion(self, screen):
-        if self.explosion_anim and not self.explosion_anim.finished:
-            self.explosion_anim.update()
-            screen.blit(self.explosion_anim.get_image(),
-                    (self.x, self.y))
-
-
     def draw(self, screen):
         if self.alive:
             rotated = pygame.transform.rotate(self.img, self.angle)
@@ -69,7 +62,7 @@ class Tank(pygame.sprite.Sprite):
                 screen.blit(rotated,
                             (self.x, self.y))
         else:
-            self.tank_explosion(screen)
-            if self.explosion_anim.finished:
+            self.explosion.tank_explosion(screen, self.x, self.y)
+            if self.explosion.explosion_anim.finished:
                 self.kill()
 

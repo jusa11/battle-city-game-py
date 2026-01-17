@@ -2,7 +2,7 @@ from Entities.Rocket.Rocket import Rocket
 from configs.sounds import SHOT
 
 
-class Weapon():
+class TankWeapon():
     def __init__(self):
         super().__init__()
         self.rocket = None

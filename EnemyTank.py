@@ -1,9 +1,9 @@
 import pygame
-from Entities.Tank import Tank
+from Entities.Tank.Tank import Tank
 from random import randint, choice
 from configs.config import SCREEN_WIDTH
 from configs.enemy_tank_config import ENEMY_TANK_IMAGE, ENEMY_TANK_FRAMES
-from Entities.Movement import Movement
+from Entities.Tank.TankMovement import TankMovement
 
 class EnemyTankSet(Tank):
     def __init__(self):
@@ -11,7 +11,7 @@ class EnemyTankSet(Tank):
         self.frame = 0
         self.old_coordinates = self.coordinates
         self.is_shot = False
-        self.movement = Movement()
+        self.movement = TankMovement()
 
 
     def update(self, context):
@@ -34,17 +34,17 @@ class EnemyTankSet(Tank):
         self.movement.move(self, enemies, map, player)
 
         if self.weapon.rocket:
-            self.weapon.rocket.move()
-            self.weapon.rocket.hit_rocket(player=player)
+            self.weapon.rocket.update(player=player)
 
-            if self.weapon.rocket and self.weapon.rocket.explosion_anim.finished:
+
+            if self.weapon.rocket and self.weapon.rocket.explosion.explosion_anim.finished:
                 self.weapon.rocket = None
 
             if self.weapon.rocket and self.weapon.rocket.alive:
                 map.destruction_brick(self.weapon.rocket, self.weapon.shot_direction)
 
 
-        # self.random_shot()
+        self.random_shot()
 
         if phase == 'random':
             self.random_phase()

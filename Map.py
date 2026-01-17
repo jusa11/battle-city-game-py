@@ -31,10 +31,10 @@ class Map(pygame.sprite.Sprite):
             if rocket.rect.colliderect(brick.rect):
                 if isinstance(brick, BricksTile):
                     brick.destroy_side(destruct_side)
-                    rocket.destroy()
+                    rocket.alive = False
                     break
                 if brick.type == 2:
-                    rocket.destroy()
+                    rocket.alive = False
                 if brick.type == 3:
                     return
 

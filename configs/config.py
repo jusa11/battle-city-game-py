@@ -12,6 +12,7 @@ KEY_TO_DIRECTION = {
             pygame.K_d: ('right', -90, (1, 0)),
             pygame.K_a: ('left', 90, (-1, 0)),
         }
+
 ROCKET_EXPLOSION_FRAMES = [
     pygame.image.load('./images/explosion-rocket-1.png'),
     pygame.image.load('./images/explosion-rocket-2.png'),
