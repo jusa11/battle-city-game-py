@@ -1,4 +1,4 @@
-from system.Animation import Animation
+from system.animations.Animation import Animation
 from configs.config import ROCKET_EXPLOSION_FRAMES
 
 

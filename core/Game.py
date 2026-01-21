@@ -19,16 +19,17 @@ class GameSet:
 
 
     def get_period(self):
-        # if self.timer < 300:
-        #     self.current_phase = 'random'
-        #     print(self.current_phase)
-        if self.timer > 0 and self.timer < 60000:
+        if self.timer < 600:
+            self.current_phase = 'random'
+            print(self.current_phase)
+        if self.timer > 600 and self.timer < 900:
             self.current_phase = 'chase'
-        # if self.timer > 600 and self.timer < 900:
-        #     self.current_phase = 'attack'
-        #     print(self.current_phase)
+            print(self.current_phase)
+        if self.timer > 900 and self.timer < 1200:
+            self.current_phase = 'attack'
+            print(self.current_phase)
 
-        if self.timer > 900:
+        if self.timer > 1200:
             self.timer = 0
 
 
@@ -61,7 +62,7 @@ class GameSet:
         self.map.draw(self.screen)
 
         self.game_info.show(self.screen)
-        # self.draw_grid(self.screen)
+        self.draw_grid(self.screen)
 
 
     def spawn_enemy_tanks(self):
@@ -69,12 +70,12 @@ class GameSet:
         self.enemies.add(new_enemy_tank)
 
 
-    # def draw_grid(self, screen, grid_size=64, color=(255, 255, 255)):
-    #     """Отрисовка сетки на карте 64х64"""
-    #     width, height = screen.get_size()
-    #
-    #     for x in range(0, width, grid_size):
-    #         pygame.draw.line(screen, color, (x, 0), (x, height), 1)
-    #
-    #     for y in range(0, height, grid_size):
-    #         pygame.draw.line(screen, color, (0, y), (width, y), 1)
+    def draw_grid(self, screen, grid_size=64, color=(255, 255, 255)):
+        """Отрисовка сетки на карте 64х64"""
+        width, height = screen.get_size()
+
+        for x in range(0, width, grid_size):
+            pygame.draw.line(screen, color, (x, 0), (x, height), 1)
+
+        for y in range(0, height, grid_size):
+            pygame.draw.line(screen, color, (0, y), (width, y), 1)

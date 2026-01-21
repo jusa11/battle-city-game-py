@@ -7,7 +7,11 @@ class TankCollisions():
 
     def check_collision(self, tank, enemies, map, player):
         # За границы поля
-        self.out_of_screen(tank)
+        if not (0 <= tank.rect.x <= SCREEN_WIDTH - tank.rect.width and
+                0 <= tank.rect.y <= SCREEN_HEIGHT - tank.rect.height):
+            tank.rect = tank.old_rect
+            tank.is_collision = True
+            return
 
         # стены
         if pygame.sprite.spritecollide(tank, map.tiles, False, pygame.sprite.collide_mask):
@@ -28,12 +32,3 @@ class TankCollisions():
             tank.is_collision = True
             return
 
-
-    def out_of_screen(self, tank):
-        """Не выходить за границы"""
-        # границы экрана
-        if not (0 <= tank.rect.x <= SCREEN_WIDTH - tank.rect.width and
-                0 <= tank.rect.y <= SCREEN_HEIGHT - tank.rect.height):
-            tank.rect = tank.old_rect
-            tank.is_collision = True
-            return

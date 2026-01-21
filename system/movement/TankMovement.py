@@ -1,13 +1,13 @@
 from configs.config import TILE_SIZE
-from configs.main_tank_config import MAIN_TANK_STEP
-from system.TankCollisions import TankCollisions
+from system.collisions.TankCollisions import TankCollisions
 
 class TankMovement:
     def __init__(self):
         self.collisions = TankCollisions()
 
 
-    def move(self, tank, enemies, map, player=None):
+    def move(self, tank, context):
+        old_coordinates = tank.coordinates
         _, _, (dx, dy) = next(
             (v for v in tank.key_to_direction.values() if v[0] == tank.direction),
             (None, None, (0, 0))
@@ -23,10 +23,12 @@ class TankMovement:
 
         tank.old_direction = tank.direction
 
-        tank.rect.x += dx * MAIN_TANK_STEP
-        tank.rect.y += dy * MAIN_TANK_STEP
+        tank.rect.x += dx * tank.speed
+        tank.rect.y += dy * tank.speed
 
-        self.collisions.check_collision(tank, enemies, map, player)
+        self.collisions.check_collision(tank, context.enemies, context.map, context.player)
 
         tank.x, tank.y = tank.rect.topleft
         tank.coordinates = (round(tank.rect.x / TILE_SIZE), round(tank.rect.y / TILE_SIZE))
+
+        return tank.coordinates != old_coordinates

@@ -1,8 +1,8 @@
 from entities.Tank import Tank
 from configs.sounds import DRIVING_TANK_SOUND
-from configs.main_tank_config import MAIN_TANK_IMAGE, MAIN_TANK_X, MAIN_TANK_Y, MAIN_TANK_FRAMES
-from system.TankMovement import TankMovement
-from system.PlayerInput import PlayerInput
+from configs.main_tank_config import MAIN_TANK_IMAGE, MAIN_TANK_X, MAIN_TANK_Y, MAIN_TANK_FRAMES, MAIN_TANK_STEP
+from system.movement.TankMovement import TankMovement
+from system.input.PlayerInput import PlayerInput
 
 class MainTank(Tank):
     def __init__(self):
@@ -10,11 +10,12 @@ class MainTank(Tank):
         self.driving_tank_sound = DRIVING_TANK_SOUND
         self.movement = TankMovement()
         self.control_driving = PlayerInput()
+        self.speed = MAIN_TANK_STEP
 
 
     def update(self, context):
         self.control_driving.tank_driving(self)
-        self.movement.move(self, context.enemies, context.map)
+        self.movement.move(self, context)
         self.resurrection(context.timer)
 
         if self.weapon.rocket:

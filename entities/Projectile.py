@@ -1,7 +1,7 @@
 import pygame
-from system.RocketMovement import RocketMovement
-from system.RocketHit import RocketHit
-from system.RocketExplosion import RocketExplosion
+from system.movement.RocketMovement import RocketMovement
+from system.collisions.RocketHit import RocketHit
+from system.animations.RocketExplosion import RocketExplosion
 from configs.config import ROCKET_SPEED
 
 
@@ -29,7 +29,11 @@ class Projectile(pygame.sprite.Sprite):
     def update(self, enemies=None, player=None, game_score=None):
         if self.alive:
             self.movement.move(self)
-            self.hit.hit_target(self.alive, enemies, player, game_score)
+            if self.hit.hit_target(enemies, player):
+                if game_score:
+                    game_score['score'] += 150
+                self.alive = False
+
         if self.explosion.explosion_anim.finished:
             self.kill()
 

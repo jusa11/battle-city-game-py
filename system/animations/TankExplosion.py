@@ -1,4 +1,4 @@
-from system.Animation import Animation
+from system.animations.Animation import Animation
 from configs.config import TANK_EXPLOSION_FRAMES
 
 class TankExplosion:

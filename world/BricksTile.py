@@ -1,11 +1,11 @@
 import pygame
-from configs.brick_confing import parts
+from configs.tile_confing  import brick_parts
 from configs.config import TILE_SIZE
 
 class BricksTile(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
-        self.parts = parts
+        self.parts = brick_parts
         self.parts_alive = [True] * 16
         self.image = self.collect_parts()
         self.rect = self.image.get_rect(topleft=(x, y))
