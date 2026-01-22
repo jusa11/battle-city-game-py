@@ -6,9 +6,9 @@ from configs.enemy_tank_config import ENEMY_TANK_IMAGE, ENEMY_TANK_FRAMES, ENEMY
 from system.movement.TankMovement import TankMovement
 from system.EnemyAI.EnemyAI import EnemyAI
 
-class EnemyTankSet(Tank):
-    def __init__(self):
-        super().__init__(ENEMY_TANK_IMAGE, randint(10, SCREEN_WIDTH - 50), 450, ENEMY_TANK_FRAMES, choice([0, -90, 180, 90]))
+class EnemyTank(Tank):
+    def __init__(self, spawn_x):
+        super().__init__(ENEMY_TANK_IMAGE, spawn_x, 0, ENEMY_TANK_FRAMES, choice([0, -90, 180, 90]))
         self.frame = 0
         self.old_coordinates = self.coordinates
         self.is_shot = False
@@ -51,7 +51,7 @@ class EnemyTankSet(Tank):
         if self.weapon.rocket:
             self.weapon.rocket.update(player=context.player)
 
-            if self.weapon.rocket and self.weapon.rocket.explosion.explosion_anim.finished:
+            if self.weapon.rocket and self.weapon.rocket.explosion_anim.anim.finished:
                 self.weapon.rocket = None
 
             if self.weapon.rocket and self.weapon.rocket.alive:

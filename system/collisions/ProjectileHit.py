@@ -1,6 +1,6 @@
 from configs.sounds import DESTROY_TANK_SOUND
 
-class RocketHit:
+class ProjectileHit:
     def __init__(self, rect):
         self.rect = rect
         self.destroy_tank_sound = DESTROY_TANK_SOUND

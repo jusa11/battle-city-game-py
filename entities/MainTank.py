@@ -17,11 +17,10 @@ class MainTank(Tank):
         self.control_driving.tank_driving(self)
         self.movement.move(self, context)
         self.resurrection(context.timer)
-
         if self.weapon.rocket:
             self.weapon.rocket.update(enemies=context.enemies, game_score=context.score)
 
-        if self.weapon.rocket and self.weapon.rocket.explosion.explosion_anim.finished:
+        if self.weapon.rocket and self.weapon.rocket.explosion_anim.anim.finished:
             self.weapon.rocket = None
 
         if self.weapon.rocket and self.weapon.rocket.alive:

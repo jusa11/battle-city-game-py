@@ -1,9 +1,10 @@
 import pygame
 from entities.MainTank import MainTank
-from entities.EnemyTank import EnemyTankSet
+from entities.EnemyTank import EnemyTank
 from world.Map import Map
 from world.GameInfo import Info
 from core.GameContext import GameContext
+from system.EnemySpawner import EnemySpawner
 from configs.config import SCREEN_WIDTH, SCREEN_HEIGHT
 
 
@@ -14,22 +15,25 @@ class GameSet:
         self.enemies = pygame.sprite.Group()
         self.map = Map()
         self.game_info = Info()
+        self.enemy_spawner = EnemySpawner()
         self.timer = 0
-        self.current_phase = None
+        self.current_phase = 'chase'
+        self.last_respawn = 0
 
 
     def get_period(self):
-        if self.timer < 600:
+        print(self.timer)
+        if self.timer < 3000:
             self.current_phase = 'random'
             print(self.current_phase)
-        if self.timer > 600 and self.timer < 900:
+        if self.timer > 3000 and self.timer < 6000:
             self.current_phase = 'chase'
             print(self.current_phase)
-        if self.timer > 900 and self.timer < 1200:
+        if self.timer > 6000 and self.timer < 9000:
             self.current_phase = 'attack'
             print(self.current_phase)
 
-        if self.timer > 1200:
+        if self.timer > 9000:
             self.timer = 0
 
 
@@ -45,8 +49,12 @@ class GameSet:
         self.get_period()
 
         # Респаун врагов
-        while len(self.enemies) < 2:
-            self.spawn_enemy_tanks()
+        if len(self.enemies) < 2:
+            if (self.timer - self.last_respawn) > 60:
+                self.enemy_spawner.spawn(self.enemies, self.player)
+                self.last_respawn = self.timer
+
+        self.enemy_spawner.update(self.screen, self.enemies)
 
 
     def draw(self):
@@ -62,12 +70,7 @@ class GameSet:
         self.map.draw(self.screen)
 
         self.game_info.show(self.screen)
-        self.draw_grid(self.screen)
-
-
-    def spawn_enemy_tanks(self):
-        new_enemy_tank = EnemyTankSet()
-        self.enemies.add(new_enemy_tank)
+        # self.draw_grid(self.screen)
 
 
     def draw_grid(self, screen, grid_size=64, color=(255, 255, 255)):

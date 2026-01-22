@@ -29,6 +29,13 @@ TANK_EXPLOSION_FRAMES = [
     pygame.image.load('./images/tank_explosion-2.png'),
 ]
 
+TANK_SPAWN_FRAMES = [
+    pygame.image.load('./images/spawn-1.png'),
+    pygame.image.load('./images/spawn-2.png'),
+    pygame.image.load('./images/spawn-3.png'),
+    pygame.image.load('./images/spawn-4.png'),
+]
+
 
 
 

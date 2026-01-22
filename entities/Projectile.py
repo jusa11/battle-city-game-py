@@ -1,6 +1,6 @@
 import pygame
 from system.movement.RocketMovement import RocketMovement
-from system.collisions.RocketHit import RocketHit
+from system.collisions.ProjectileHit import ProjectileHit
 from system.animations.RocketExplosion import RocketExplosion
 from configs.config import ROCKET_SPEED
 
@@ -16,8 +16,8 @@ class Projectile(pygame.sprite.Sprite):
         self.angle = angle
         self.alive = True
         self.movement = RocketMovement()
-        self.hit = RocketHit(self.rect)
-        self.explosion = RocketExplosion()
+        self.hit = ProjectileHit(self.rect)
+        self.explosion_anim = RocketExplosion()
         self.possible_shot_directions = {
             0: lambda: setattr(self, 'y', self.y - ROCKET_SPEED),
             -90: lambda: setattr(self, 'x', self.x + ROCKET_SPEED),
@@ -34,7 +34,7 @@ class Projectile(pygame.sprite.Sprite):
                     game_score['score'] += 150
                 self.alive = False
 
-        if self.explosion.explosion_anim.finished:
+        if self.explosion_anim.anim.finished:
             self.kill()
 
 
@@ -43,4 +43,4 @@ class Projectile(pygame.sprite.Sprite):
             rotated = pygame.transform.rotate(self.img, self.angle)
             screen.blit(rotated, self.rect)
         if not self.alive:
-            self.explosion.rocket_explosion(screen, self.x, self.y)
+            self.explosion_anim.start_anim(screen, self.x, self.y)

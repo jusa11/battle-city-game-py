@@ -21,7 +21,7 @@ class Tank(pygame.sprite.Sprite):
         self.key_to_direction = KEY_TO_DIRECTION
         self.tracks = tracks
         self.tracks_anim = Animation(self.tracks, 10)
-        self.explosion = TankExplosion()
+        self.explosion_anim = TankExplosion()
         self.old_direction = None
         self.coordinates = None
         self.old_rect = None
@@ -61,8 +61,9 @@ class Tank(pygame.sprite.Sprite):
                 rotated = pygame.transform.rotate(img, self.angle)
                 screen.blit(rotated,
                             (self.x, self.y))
+
         else:
-            self.explosion.tank_explosion(screen, self.x, self.y)
-            if self.explosion.explosion_anim.finished:
+            self.explosion_anim.start_anim(screen, self.x, self.y)
+            if self.explosion_anim.anim.finished:
                 self.kill()
 

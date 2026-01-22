@@ -1,10 +1,7 @@
 import pygame
 from configs.config import SCREEN_WIDTH, SCREEN_HEIGHT
 
-class TankCollisions():
-    def __init__(self):
-        super().__init__()
-
+class TankCollisions:
     def check_collision(self, tank, enemies, map, player):
         # За границы поля
         if not (0 <= tank.rect.x <= SCREEN_WIDTH - tank.rect.width and
